@@ -1,0 +1,19 @@
+{
+  "name": "kaidoParser",
+  "version": "0.0.1",
+  "description": "the gherking-files parser/matcher",
+  "main": "kaidoParser.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/luffy1087/kaidoParser.git"
+  },
+  "keywords": [
+    "gherkins"
+  ],
+  "author": "Luffy1087",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/luffy1087/kaidoParser/issues"
+  },
+  "homepage": "https://github.com/luffy1087/kaidoParser"
+}
