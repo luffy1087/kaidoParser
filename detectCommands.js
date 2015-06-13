@@ -11,7 +11,7 @@
 		,	R_TEARDOWN = /^TearDown:$/m
 		, R_FEATURE = /^Feature:(.+)/m
 		,	R_SCENARIOS = /^\tScenario:(.+)/m
-		, R_TABLE = /^\tWhere:/m
+		, R_TABLE = /^\tTable:/m
 		,	R_PLACEHOLDER = /((?:\s|\t)*\w+(?:\s|\t)*\|?)/g
 		,	R_STEPS = [R_START_WITH_TAB, R_MIN_TWO_WORDS, R_STEP_INFO]
 		,	R_PLACEHOLDERS = [R_START_WITH_DOUBLE_TABS, R_PLACEHOLDER];
@@ -82,6 +82,7 @@
 				command = 'detectTearDown';
 				executed = true;
 			}
+			this.addKeyWord(stepKeyWord);
 		}
 		return {
 			isExecuted : executed,
@@ -232,6 +233,14 @@
 		}
 	}
 
+	function addKeyWord(keyWord, feature) {
+		var keyWords = feature.keyWords
+		var isInArray = keyWords.indexOf(keyWord);
+		if (!isInArray) {
+			keyWords.push(keyWord);
+		}
+	}
+
 	function DetectCommandClass() {
 		
 		this.commands = [
@@ -258,6 +267,7 @@
 	DetectCommandClass.prototype.removeCommands = removeCommands;
 	DetectCommandClass.prototype.getLastScenario = getLastScenario;
 	DetectCommandClass.prototype.executeRegExp = executeRegExp;
+	DetectCommandClass.prototype.addKeyWord = addKeyWord;
 
 
 	module.exports = DetectCommandClass;

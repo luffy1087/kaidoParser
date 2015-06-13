@@ -6,9 +6,10 @@
 (function(){
 	
 	//dependencies
-	var glob = require('glob');
-	var fs = require('fs');
-	var detectCommands = require('./detectCommands');
+	var glob = require('glob')
+		,	fs = require('fs')
+		,	detectCommands = require('./detectCommands')
+		,	matcher = require('./kaidoMatcher');
 
 	function getFeatureFiles(resolve, reject) {
 		glob('features/**/*.feature', null, function(err, files) {
@@ -55,10 +56,11 @@
 		//feature object to return
 		var feature = {
 			fileName : fileName,
-			scenarios : []
+			scenarios : [],
+			keyWords : []
 		};
 		
-		var detectCommand = new detectCommands();
+		var detectCommand = new detectCommands(); //in the feture, Implement init function passing the feature objerct instead of passing that everytime
 	
 		contentLines.forEach(function(line, index) {		
 			try {
@@ -73,14 +75,17 @@
 	}
 
 	function explodeIncludes(contentFeature) {
+		
 		var includesToExplode = contentFeature.match(/\t+#INCLUDE#\s+(\w+)/mg);
+		
 		if (!!includesToExplode) {
-			var 
-				alreadyIncluded = {}
-			,	fileToInclude
-			,	filePath
-			,	fileName
-			,	startTabs;
+			
+			var alreadyIncluded = {}
+				,	fileToInclude
+				,	filePath
+				,	fileName
+				,	startTabs;
+
 			for (var i = 0, includeToExplode; includeToExplode = includesToExplode[i]; i++) {	
 				fileName = includeToExplode.replace(/^\t+/, '').replace(/\s+/, ' ').split(' ')[1];
 				startTabs = includeToExplode.match(/^\t+/)[0];
@@ -95,6 +100,7 @@
 			}
 			return contentFeature;
 		}
+
 	}
 
 	function getFeatureFilesError(err) {
@@ -110,7 +116,8 @@
 	}
 	
 	module.exports = {
-		parse : parse
+		parse : parse,
+		matcher : matcher
 	};
 
 })();

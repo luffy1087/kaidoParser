@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/luffy1087/kaidoParser/issues"
   },
-  "homepage": "https://github.com/luffy1087/kaidoParser"
+  "homepage": "https://github.com/luffy1087/kaidoParser",
+  "devDependencies": {
+    "mocha": "^2.2.5"
+  }
 }
