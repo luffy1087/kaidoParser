@@ -7,15 +7,15 @@
 	
 	//dependencies
 	var glob = require('glob')
-		,	fs = require('fs')
-		,	detectCommands = require('./detectCommands')
-		,	matcher = require('./kaidoMatcher');
+	  ,	fs = require('fs')
+	  ,	detectCommands = require('./detectCommands');
 
 	function getFeatureFiles(resolve, reject) {
 		glob('features/**/*.feature', null, function(err, files) {
 			if (err) {
 				reject(err);
 			} else if (files && files.length > 0) {
+				this.files = files;
 				resolve(files);
 			}
 		});
@@ -35,8 +35,7 @@
 	}
 
 	function parseFeatures(contents) {
-		var features = [];
-		var feature;
+		var features = [], feature;
 		for (var index = 0, content; content = contents[index]; index++) {
 			feature = parseFeature(content);
 			features.push(feature);
@@ -46,12 +45,11 @@
 
 	function parseFeature(content) {
 
-		var fileName = content.fileName;
-		var content = content.content.toString();
-		var contentFeatureWithIncludes = explodeIncludes(content); //replace placeholders with the content of the files keeping the tabs space	
-		var contentFeature = contentFeatureWithIncludes.replace(/^\s*\r?\n/mg, '');
-		
-		var contentLines = contentFeature.split('\n'); //it first removes blank lines, then splits them
+		var fileName = content.fileName
+		  ,	content = content.content.toString()
+		  ,	contentFeatureWithIncludes = explodeIncludes(content); //replace placeholders with the content of the files keeping the tabs space	
+		  ,	contentFeature = contentFeatureWithIncludes.replace(/^\s*\r?\n/mg, '')
+		  ,	contentLines = contentFeature.split('\n'); //it first removes blank lines, then splits them
 
 		//feature object to return
 		var feature = {
@@ -81,10 +79,10 @@
 		if (!!includesToExplode) {
 			
 			var alreadyIncluded = {}
-				,	fileToInclude
-				,	filePath
-				,	fileName
-				,	startTabs;
+			  ,	fileToInclude
+			  ,	filePath
+			  ,	fileName
+			  ,	startTabs;
 
 			for (var i = 0, includeToExplode; includeToExplode = includesToExplode[i]; i++) {	
 				fileName = includeToExplode.replace(/^\t+/, '').replace(/\s+/, ' ').split(' ')[1];
@@ -108,16 +106,29 @@
 		console.log(err);
 	}
 
-	function parse() {
-		var parser = new Promise(getFeatureFiles)
-				.then(readFatureFiles, getFeatureFilesError)
-				.then(parseFeatures);
-		return parser;
+	function start() {
+		var p = new Promise(getFeatureFiles.bind(this));
+		
+		p.then(function(files) {
+			this.readFatureFiles(files);
+		}.bind(this), getFeatureFilesError);
+		
+		p.then(function(contents){
+			this.parseFeatures(contents);
+		});
+		
+		return p;
 	}
+
+	function KaidoParserClass() {}
+	KaidoParserClass.prototype.getFeatureFiles = getFeatureFiles;
+	KaidoParserClass.prototype.getFeatureFilesError = getFeatureFilesError;
+	KaidoParserClass.prototype.readFatureFiles = readFatureFiles;
+	KaidoParserClass.prototype.parseFeatures = parseFeatures;
+	KaidoParserClass.prototype.parseFeature = parseFeature;
+	KaidoParserClass.prototype.explodeIncludes = explodeIncludes;
+	KaidoParserClass.prototype.start = start;
 	
-	module.exports = {
-		parse : parse,
-		matcher : matcher
-	};
+	module.exports = KaidoParserClass;
 
 })();

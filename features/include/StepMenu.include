@@ -1,0 +1,3 @@
+Given I visit the homepage in [isoCode]				
+When I [action] on category menu
+And I can see all of the categories
