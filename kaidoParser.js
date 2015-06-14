@@ -47,7 +47,7 @@
 
 		var fileName = content.fileName
 		  ,	content = content.content.toString()
-		  ,	contentFeatureWithIncludes = explodeIncludes(content); //replace placeholders with the content of the files keeping the tabs space	
+		  ,	contentFeatureWithIncludes = explodeIncludes(content) //replace placeholders with the content of the files keeping the tabs space	
 		  ,	contentFeature = contentFeatureWithIncludes.replace(/^\s*\r?\n/mg, '')
 		  ,	contentLines = contentFeature.split('\n'); //it first removes blank lines, then splits them
 
