@@ -7,8 +7,9 @@
 	
 	//dependencies
 	var glob = require('glob')
-	  ,	fs = require('fs')
-	  ,	detectCommands = require('./detectCommands');
+	  , Promise = require('promise')
+	  , fs = require('fs')
+	  , detectCommands = require('./detectCommands');
 
 	function getFeatureFiles(resolve, reject) {
 		glob('features/**/*.feature', null, function(err, files) {

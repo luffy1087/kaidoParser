@@ -1,8 +1,9 @@
 (function() {
 	
 	//dependencies
-	var glob = require('glob');
-	var kaidoStepsClass = require('./kaidoSteps');
+	var glob = require('glob')
+	  , Promise = require('promise')
+	  , kaidoStepsClass = require('./kaidoSteps');
 
 	function getStepsFiles(resolve, reject) {
 		glob('steps/**/*.js', null, function(err, files) {

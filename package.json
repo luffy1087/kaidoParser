@@ -17,6 +17,11 @@
   },
   "homepage": "https://github.com/luffy1087/kaidoParser",
   "devDependencies": {
-    "mocha": "^2.2.5"
+    "mocha": "^2.2.5",
+    "should": "^6.0.3"
+  },
+  "dependencies": {
+    "glob": "^5.0.10",
+    "promise": "^7.0.3"
   }
 }

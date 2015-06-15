@@ -2,19 +2,19 @@
 
 	//EXPRESSION DEPENDENCIES	
 	var R_START_WITH_DOUBLE_TABS = /^\t\t/
-	  ,	R_START_WITH_TAB = /^\t/
-	  ,	R_MIN_TWO_WORDS = /(\s*\b\w+\b){2,}/
-	  ,	R_STEP_INFO = /^\t\t?(\b\w+\b)\s+([\w\s\[\]]+)$/;
+	  , R_START_WITH_TAB = /^\t/
+	  , R_MIN_TWO_WORDS = /(\s*\b\w+\b){2,}/
+	  , R_STEP_INFO = /^\t\t?(\b\w+\b)\s+([\w\s\[\]]+)$/;
 	
 	//REGULAR EXPRESSION
 	var R_SETUP = /^SetUp:$/m
 	  , R_TEARDOWN = /^TearDown:$/m
 	  , R_FEATURE = /^Feature:(.+)/m
-	  ,	R_SCENARIOS = /^\tScenario:(.+)/m
+	  , R_SCENARIOS = /^\tScenario:(.+)/m
 	  , R_TABLE = /^\tTable:/m
-	  ,	R_PLACEHOLDER = /((?:\s|\t)*\w+(?:\s|\t)*\|?)/g
-	  ,	R_STEPS = [R_START_WITH_TAB, R_MIN_TWO_WORDS, R_STEP_INFO]
-	  ,	R_PLACEHOLDERS = [R_START_WITH_DOUBLE_TABS, R_PLACEHOLDER];
+	  , R_PLACEHOLDER = /((?:\s|\t)*\w+(?:\s|\t)*\|?)/g
+	  , R_STEPS = [R_START_WITH_TAB, R_MIN_TWO_WORDS, R_STEP_INFO]
+	  , R_PLACEHOLDERS = [R_START_WITH_DOUBLE_TABS, R_PLACEHOLDER];
 
 	function camelize(s) {
 		return s.replace(/\s(.)/g, function(whatFound) {
