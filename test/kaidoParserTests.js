@@ -78,7 +78,7 @@ describe('kaidoParser tests', function() {
 		lines[2].should.be.equal('And I can see all of the categories');
 	});
 
-	it.only('start', function(done) {		
+	it('start', function(done) {		
 		var getFeatureFilesSpy = sinon.spy(kaidoParser, 'getFeatureFiles');
 		var readFatureFilesSpy = sinon.spy(kaidoParser, 'readFatureFiles');
 		var parseFeaturesSpy = sinon.spy(kaidoParser, 'parseFeatures');
