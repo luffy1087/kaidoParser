@@ -23,8 +23,9 @@
 	}
 	
 	function detectFeature(line, feature) {
-		var featureNameInfo = this.executeRegExp(line, R_FEATURE);
-		var featureName;
+		var featureNameInfo = this.executeRegExp(line, R_FEATURE)
+		  , featureName;
+
 		if (!!featureNameInfo) {
 			featureName = featureNameInfo[1].trim();
 			feature.name = featureName;
@@ -36,9 +37,10 @@
 	}
 
 	function detectScenario(line, feature) {
-		var scenarioName, camelScenarioName;
-		var scenarios = feature.scenarios;
-		var scenarioInfo = this.executeRegExp(line, R_SCENARIOS);
+		var scenarioName, camelScenarioName
+		  , scenarios = feature.scenarios
+		  , scenarioInfo = this.executeRegExp(line, R_SCENARIOS);
+
 		if (!!scenarioInfo) {
 			scenarioName = scenarioInfo[1].trim();
 			camelScenarioName = camelize(scenarioName);
@@ -56,9 +58,10 @@
 
 	function detectStep(line, feature) {
 		//detects every steps if scenario was detected, else check setUp and tearDown
-		var command = 'detectStep';
-		var executed = false;
-		var stepInfo = this.executeRegExp(line, R_STEPS);
+		var command = 'detectStep'
+		  , executed = false
+		  , stepInfo = this.executeRegExp(line, R_STEPS);
+
 		if (!!stepInfo) {
 			//step vars
 			var stepKeyWord = stepInfo[1].trim();
@@ -130,9 +133,10 @@
 	}
 
 	function detectPlaceholders(line, feature) {
-		var placeHolderInfo = this.executeRegExp(line, R_PLACEHOLDERS);
-		var table = this.getLastScenario(feature).table;
-		var isPlaceholderLine = !!placeHolderInfo && !!table;
+		var placeHolderInfo = this.executeRegExp(line, R_PLACEHOLDERS)
+		  , table = this.getLastScenario(feature).table
+		  , isPlaceholderLine = !!placeHolderInfo && !!table;
+
 		if (!!placeHolderInfo && table) {
 			var trimmedPlaceHolders = placeHolderInfo.map(function(val){ return val.replace(/[\s\|]/g, ''); });
 			if (table.placeholdersNames.length === 0) {
@@ -141,6 +145,7 @@
 				table.placeholdersValues.push(trimmedPlaceHolders);
 			}
 		}
+		
 		return {
 			isExecuted : isPlaceholderLine,
 			commandName : 'detectPlaceholders'
@@ -148,11 +153,13 @@
 	}
 
 	function getLastScenario(feature) {
-		var scenarios = feature.scenarios;
-		var scenariosLength = scenarios.length;
+		var scenarios = feature.scenarios
+		  , scenariosLength = scenarios.length;
+
 		if (scenariosLength > 0) {
 			return scenarios[scenariosLength-1];
 		}
+		
 		return false;
 	}
 
@@ -175,12 +182,14 @@
 	} 
 
 	function execute(line, feature) {
-		var shouldDeleteCommand, commandsToRemove = [];
-		var commands = this.commands, commandExecution;
-		var isCommandExecuted, executedCommandName;
+		var shouldDeleteCommand
+		  , commandsToRemove = []
+		  , commands = this.commands
+		  , commandExecution
+		  , isCommandExecuted
+		  , executedCommandName;
 		
-		debugger;
-		for (var i = 0, command, commandExecution; command = commands[i]; i++) {
+		for (var i = 0, command; command = commands[i]; i++) {
 			
 			commandExecution = command.call(this, line, feature);
 			isCommandExecuted = commandExecution.isExecuted;
@@ -235,7 +244,8 @@
 
 	function addKeyWord(keyWord, feature) {
 		var keyWords = feature.keyWords
-		var isInArray = keyWords.indexOf(keyWord);
+		  , isInArray = keyWords.indexOf(keyWord) > -1;
+		
 		if (!isInArray) {
 			keyWords.push(keyWord);
 		}

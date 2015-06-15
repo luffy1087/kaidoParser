@@ -57,6 +57,18 @@ describe('detectCommands tests', function() {
 		lastScenario.name.should.be.equal('scenario 1');
 	});
 
+	it('addKeyWord', function() {
+		feature.keyWords = [
+			'And',
+			'When',
+			'Then'
+		];
+		detectCommands.addKeyWord('Then', feature);
+		feature.keyWords.join(',').match(/Then/g).length.should.be.equal(1);
+		detectCommands.addKeyWord('Log', feature);
+		feature.keyWords.indexOf('Log').should.be.greaterThan(-1);
+	});
+
 	it('detectFeature', function() {
 		var line = 'Feature: my feature will be great';
 		var res = detectCommands.detectFeature(line, feature);
@@ -189,6 +201,87 @@ describe('detectCommands tests', function() {
 		feature.scenarios[0].table.placeholdersValues[0].should.be.instanceOf(Array);
 		feature.scenarios[0].table.placeholdersValues[0][0].should.be.equal('IT');
 		feature.scenarios[0].table.placeholdersValues[0][1].should.be.equal('mouseover');
+	});
+
+	it('removeCommands', function() {
+		var commands = detectCommands.commands;
+		var commandsLength = commands.length;
+		var commandsToRemove = [
+			'detectSetUp',
+			'detectTearDown'
+		];
+		detectCommands.removeCommands(commandsToRemove);
+		commands.length.should.be.lessThan(commandsLength);
+		var res = commands.filter(function(func) {
+			return func.name === 'detectSetUp' || func.name === 'detectTearDown';
+		});
+		res.length.should.be.equal(0); // commands have been removed
+	});
+
+	it('shouldDeleteCommand', function() {
+		//1
+		detectCommands.shouldDeleteCommand(false, 'detectSetUp', feature).should.be.false; // command not executed
+		//2
+		feature.name = 'feature 1';
+		detectCommands.shouldDeleteCommand(true, 'detectFeature', feature).should.be.true; // command executed, feature has the name
+		//3
+		feature.setUp = {};
+		detectCommands.shouldDeleteCommand(true, 'detectSetUp', feature).should.be.false;
+		//4
+		feature.setUp.step = 'step test';
+		detectCommands.shouldDeleteCommand(true, 'detectSetUp', feature).should.be.true;feature.setUp.step = 'step test';
+		//5
+		feature.tearDown = {};
+		detectCommands.shouldDeleteCommand(true, 'detectTearDown', feature).should.be.false;
+		//6
+		feature.tearDown.step = 'step test';
+		detectCommands.shouldDeleteCommand(true, 'detectTearDown', feature).should.be.true;
+		//7
+		detectCommands.shouldDeleteCommand(true, 'detectScenario', feature).should.be.false;
+	});
+
+	it('execute', function() {
+		(function() {
+			detectCommands.execute('Feature: my feature name', feature);
+			detectCommands.execute('SetUp:', feature);
+			detectCommands.execute('\tLog I log cookies', feature);
+			detectCommands.execute('TearDown:', feature);
+			detectCommands.execute('\tCheck I Check cookie name', feature);
+			detectCommands.execute('\tScenario: first scenario', feature);
+			detectCommands.execute('\t\tGiven I visit [page]', feature);
+			detectCommands.execute('\t\tWhen I [action] on menu', feature);
+			detectCommands.execute('\t\tThen Categories should appear', feature);
+			detectCommands.execute('\tTable:', feature);
+			detectCommands.execute('\t\tpage\t\t|\t\taction', feature);
+			detectCommands.execute('\t\thomepage\t\t|\t\tclick', feature);
+		}).should.not.throw();
+
+		feature.name.should.be.equal('my feature name');
+		feature.setUp.should.be.instanceOf(Object);
+		feature.setUp.keyWord.should.be.equal('Log');
+		feature.setUp.step.should.be.equal('I log cookies');
+		feature.tearDown.should.be.instanceOf(Object);
+		feature.tearDown.keyWord.should.be.equal('Check');
+		feature.tearDown.step.should.be.equal('I Check cookie name');
+		feature.scenarios.length.should.be.equal(1);
+		feature.scenarios[0].name.should.be.equal('first scenario');
+		feature.scenarios[0].camelName.should.be.equal('firstScenario');
+		feature.scenarios[0].steps.should.be.instanceOf(Array);
+		feature.scenarios[0].steps.length.should.be.equal(3);
+		feature.scenarios[0].steps[0].keyWord.should.be.equal('Given');
+		feature.scenarios[0].steps[0].step.should.be.equal('I visit [page]');
+		feature.scenarios[0].steps[1].keyWord.should.be.equal('When');
+		feature.scenarios[0].steps[1].step.should.be.equal('I [action] on menu');
+		feature.scenarios[0].steps[2].keyWord.should.be.equal('Then');
+		feature.scenarios[0].steps[2].step.should.be.equal('Categories should appear');
+		feature.scenarios[0].table.should.be.instanceOf(Object);
+		feature.scenarios[0].table.placeholdersNames.length.should.be.equal(2);
+		feature.scenarios[0].table.placeholdersNames[0].should.be.equal('page');
+		feature.scenarios[0].table.placeholdersNames[1].should.be.equal('action');
+		feature.scenarios[0].table.placeholdersValues.length.should.be.equal(1);
+		feature.scenarios[0].table.placeholdersValues[0].length.should.be.equal(2);
+		feature.scenarios[0].table.placeholdersValues[0][0].should.be.equal('homepage');
+		feature.scenarios[0].table.placeholdersValues[0][1].should.be.equal('click');
 	});
 
 });
