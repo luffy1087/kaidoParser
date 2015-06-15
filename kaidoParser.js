@@ -19,13 +19,12 @@
 				this.files = files;
 				resolve(files);
 			}
-		});
+		});	
 	}
 
 	function readFatureFiles(files) {
 		var featuresContents = [], content;
 		for (var index = 0, file; file = files[index]; index++) {
-			console.log('read file : ' + file);
 			content = fs.readFileSync(file);
 			featuresContents.push({
 				content : content,
@@ -38,7 +37,7 @@
 	function parseFeatures(contents) {
 		var features = [], feature;
 		for (var index = 0, content; content = contents[index]; index++) {
-			feature = parseFeature(content);
+			feature = this.parseFeature(content);
 			features.push(feature);
 		}
 		return features;
@@ -48,7 +47,7 @@
 
 		var fileName = content.fileName
 		  ,	content = content.content.toString()
-		  ,	contentFeatureWithIncludes = explodeIncludes(content) //replace placeholders with the content of the files keeping the tabs space	
+		  ,	contentFeatureWithIncludes = this.explodeIncludes(content) //replace placeholders with the content of the files keeping the tabs space	
 		  ,	contentFeature = contentFeatureWithIncludes.replace(/^\s*\r?\n/mg, '')
 		  ,	contentLines = contentFeature.split('\n'); //it first removes blank lines, then splits them
 
@@ -108,7 +107,7 @@
 	}
 
 	function start() {
-		var p = new Promise(getFeatureFiles.bind(this));
+		var p = new Promise(this.getFeatureFiles.bind(this));
 		
 		p.then(function(files) {
 			this.readFatureFiles(files);
@@ -116,7 +115,7 @@
 		
 		p.then(function(contents){
 			this.parseFeatures(contents);
-		});
+		}.bind(this));
 		
 		return p;
 	}
