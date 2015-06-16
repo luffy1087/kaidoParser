@@ -1,6 +1,5 @@
 var DetectCommandsClass = require('../detectCommands')
-  , should = require('should')
-  ,	features = require('./featuresModel');
+  , should = require('should');
 
 var feature = {
 	scenarios : [],
@@ -52,9 +51,21 @@ describe('detectCommands tests', function() {
 	});
 
 	it('getLastScenario', function() {
-		var lastScenario = detectCommands.getLastScenario(features[0]);
+		feature.scenarios = [
+			{
+				name : 'first scenario ',
+				camelName : 'firstScenario',
+				steps : []
+			},
+			{
+				name : 'second scenario',
+				camelName : 'secondScenario',
+				steps : []
+			}
+		];
+		var lastScenario = detectCommands.getLastScenario(feature);
 		lastScenario.should.be.instanceOf(Object);
-		lastScenario.name.should.be.equal('scenario 1');
+		lastScenario.name.should.be.equal('second scenario');
 	});
 
 	it('addKeyWord', function() {
