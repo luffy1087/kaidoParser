@@ -107,14 +107,14 @@
 	}
 
 	function start() {
-		var p = new Promise(this.getFeatureFiles.bind(this));
+		var p = new Promise(this.getFeatureFiles.bind(this))
+
+		.then(function(files) {
+			return this.readFatureFiles(files);
+		}.bind(this), getFeatureFilesError)
 		
-		p.then(function(files) {
-			this.readFatureFiles(files);
-		}.bind(this), getFeatureFilesError);
-		
-		p.then(function(contents){
-			this.parseFeatures(contents);
+		.then(function(contents){
+			return this.parseFeatures(contents);
 		}.bind(this));
 		
 		return p;
