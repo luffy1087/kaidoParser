@@ -58,18 +58,108 @@
 			keyWords : []
 		};
 		
-		var detectCommand = new detectCommands(); //in the feture, Implement init function passing the feature objerct instead of passing that everytime
+		var detectCommand = new detectCommands();
 	
 		contentLines.forEach(function(line, index) {		
 			try {
 				detectCommand.execute(line, feature);
 			} catch (e) {
-				console.log('An error has occurred');
+				console.error('An error has occurred detecting commands : [ Line : ' + line + ']');
 				console.log(e);
 			}
 		});
 
+		this.resolveTables(feature);
+
 		return feature;
+	}
+
+	function resolveTables(feature) {
+		var tables = feature.tables;
+		
+		if (!tables) {
+			return false;
+		}
+
+		var scenarioNameToRepeat,
+			scenarioToRepeat,
+			currentTable,
+			placeholdersValues,
+			placeholdersNames;
+
+		for (scenarioNameToRepeat in tables) {
+			currentTable = tables[scenarioNameToRepeat];
+			placeholdersNames = currentTable.placeholdersNames;
+			placeholdersValues = currentTable.placeholdersValues;
+			scenarioToRepeat = this.getScenarioByName(scenarioNameToRepeat, feature);
+			for (var i = 0, currentPlaceholdersValues; currentPlaceholdersValues = placeholdersValues[i]; i++) {
+				this.repeatSteps({
+					scenario : scenarioToRepeat,
+					placeholdersNames : placeholdersNames,
+					placeholdersValues : currentPlaceholdersValues,
+					feature : feature,
+					repeatedTime : i
+				});
+			}
+		}
+	}
+
+
+	function repeatSteps(repeatInfo) {
+		var scenarioInfo = repeatInfo.scenario
+		  , scenarioIndex = scenarioInfo.index
+		  , scenario = this.cloneObject(scenarioInfo.scenario)
+		  , steps = scenario.steps
+		  , placeholdersNames = repeatInfo.placeholdersNames
+		  , placeholdersValues = repeatInfo.placeholdersValues
+		  , repeatedTime = repeatInfo.repeatedTime
+		  , feature = repeatInfo.feature;
+
+		for (var i = 0, step; step = steps[i]; i++) {
+			this.resolveStep(step, placeholdersNames, placeholdersValues);
+		}
+
+		if (repeatedTime === 0) {
+			feature.scenarios.splice(scenarioIndex, 1, scenario);
+		} else {
+			scenarioIndex += repeatedTime;
+			feature.scenarios.splice(scenarioIndex, 0, scenario);
+		}
+	}
+
+	function resolveStep(step, placeholdersNames, placeholdersValues) {
+		var stepValue = step.step
+		  , currentPlaceholderName
+		  , currentPlaceholderValue
+		  , regName
+		  , numberToRepeat = placeholdersValues.length;
+		
+		for (var i = 0; i < numberToRepeat; i++) {
+			currentPlaceholderName = placeholdersNames[i];
+			currentPlaceholderValue = placeholdersValues[i];
+			regName = new RegExp('\\[' + currentPlaceholderName + '\\]', 'i');
+			step.step = stepValue.replace(regName, currentPlaceholderValue);
+			stepValue = step.step;
+		}
+	}
+
+	function cloneObject(object) {
+		var objectString = JSON.stringify(object);
+		var newObject = JSON.parse(objectString);
+		return newObject;
+	}
+
+	function getScenarioByName(name, feature) {
+		var scenarios = feature.scenarios;
+		for (var i = 0, scenario; scenario = scenarios[i]; i++) {
+			if (scenario.name === name || scenario.camelName === name) {
+				return { 
+					scenario : scenario,
+					index : i
+				};
+			}
+		}
+		return false;
 	}
 
 	function explodeIncludes(contentFeature) {
@@ -127,6 +217,11 @@
 	KaidoParserClass.prototype.parseFeatures = parseFeatures;
 	KaidoParserClass.prototype.parseFeature = parseFeature;
 	KaidoParserClass.prototype.explodeIncludes = explodeIncludes;
+	KaidoParserClass.prototype.getScenarioByName = getScenarioByName;
+	KaidoParserClass.prototype.resolveTables = resolveTables;
+	KaidoParserClass.prototype.resolveStep = resolveStep;
+	KaidoParserClass.prototype.repeatSteps = repeatSteps;
+	KaidoParserClass.prototype.cloneObject = cloneObject;
 	KaidoParserClass.prototype.start = start;
 	
 	module.exports = KaidoParserClass;

@@ -12,6 +12,7 @@ describe('detectCommands tests', function() {
     	detectCommands = new DetectCommandsClass();
     	feature.scenarios = [];
     	feature.keyWords = [];
+    	delete feature.tables;
   	});
 	
 	it('prototype', function() {
@@ -158,6 +159,7 @@ describe('detectCommands tests', function() {
 
 	it('detectTable', function() {
 		feature.scenarios.push({
+			camelName : 'scenarioTest',
 			steps : [{
 				keyWord : 'test',
 				steps : 'step test'	
@@ -168,50 +170,57 @@ describe('detectCommands tests', function() {
 		res.should.be.instanceOf(Object);
 		res.isExecuted.should.be.true;
 		res.commandName.should.be.equal('detectTable');
-		feature.scenarios[0].table.should.be.instanceOf(Object);
+		feature.tables.should.be.instanceOf(Object);
+		feature.tables.should.have.property('scenarioTest').instanceOf(Object);
 	});
 
 	it('detectPlaceHolders names', function() {
-		feature.scenarios.push({
-			steps : [{
-				keyWord : 'test',
-				steps : 'step test'
-			}],
-			table : {
+		feature.tables = {
+			scenarioTest : {
 				placeholdersNames : [],
 				placeholdersValues : []
 			}
+		};
+		feature.scenarios.push({
+			camelName : 'scenarioTest',
+			steps : [{
+				keyWord : 'test',
+				steps : 'step test'
+			}]
 		});
 		var line = '\t\tisoCode\t\taction';
 		var res = detectCommands.detectPlaceholders(line, feature);
 		res.should.be.instanceOf(Object);
 		res.isExecuted.should.be.true;
 		res.commandName.should.be.equal('detectPlaceholders');
-		feature.scenarios[0].table.placeholdersNames.length.should.be.equal(2);
-		feature.scenarios[0].table.placeholdersNames[0].should.be.equal('isoCode');
-		feature.scenarios[0].table.placeholdersNames[1].should.be.equal('action');
+		feature.tables.scenarioTest.placeholdersNames.length.should.be.equal(2);
+		feature.tables.scenarioTest.placeholdersNames[0].should.be.equal('isoCode');
+		feature.tables.scenarioTest.placeholdersNames[1].should.be.equal('action');
 	});
 
 	it('detectPlaceHolders values', function() {
-		feature.scenarios.push({
-			steps : [{
-				keyWord : 'test',
-				steps : 'step test'
-			}],
-			table : {
+		feature.tables = {
+			scenarioTest : {
 				placeholdersNames : ['isoCode', 'action'],
 				placeholdersValues : []
 			}
+		};
+		feature.scenarios.push({
+			camelName : 'scenarioTest',
+			steps : [{
+				keyWord : 'test',
+				steps : 'step test'
+			}]
 		});
 		var line = '\t\tIT\t\tmouseover';
 		var res = detectCommands.detectPlaceholders(line, feature);
 		res.should.be.instanceOf(Object);
 		res.isExecuted.should.be.true;
 		res.commandName.should.be.equal('detectPlaceholders');
-		feature.scenarios[0].table.placeholdersValues.length.should.be.equal(1);
-		feature.scenarios[0].table.placeholdersValues[0].should.be.instanceOf(Array);
-		feature.scenarios[0].table.placeholdersValues[0][0].should.be.equal('IT');
-		feature.scenarios[0].table.placeholdersValues[0][1].should.be.equal('mouseover');
+		feature.tables.scenarioTest.placeholdersValues.length.should.be.equal(1);
+		feature.tables.scenarioTest.placeholdersValues[0].should.be.instanceOf(Array);
+		feature.tables.scenarioTest.placeholdersValues[0][0].should.be.equal('IT');
+		feature.tables.scenarioTest.placeholdersValues[0][1].should.be.equal('mouseover');
 	});
 
 	it('removeCommands', function() {
@@ -285,14 +294,15 @@ describe('detectCommands tests', function() {
 		feature.scenarios[0].steps[1].step.should.be.equal('I [action] on menu');
 		feature.scenarios[0].steps[2].keyWord.should.be.equal('Then');
 		feature.scenarios[0].steps[2].step.should.be.equal('Categories should appear');
-		feature.scenarios[0].table.should.be.instanceOf(Object);
-		feature.scenarios[0].table.placeholdersNames.length.should.be.equal(2);
-		feature.scenarios[0].table.placeholdersNames[0].should.be.equal('page');
-		feature.scenarios[0].table.placeholdersNames[1].should.be.equal('action');
-		feature.scenarios[0].table.placeholdersValues.length.should.be.equal(1);
-		feature.scenarios[0].table.placeholdersValues[0].length.should.be.equal(2);
-		feature.scenarios[0].table.placeholdersValues[0][0].should.be.equal('homepage');
-		feature.scenarios[0].table.placeholdersValues[0][1].should.be.equal('click');
+		feature.tables.should.be.instanceOf(Object);
+		feature.tables.firstScenario.should.be.instanceOf(Object);
+		feature.tables.firstScenario.placeholdersNames.length.should.be.equal(2);
+		feature.tables.firstScenario.placeholdersNames[0].should.be.equal('page');
+		feature.tables.firstScenario.placeholdersNames[1].should.be.equal('action');
+		feature.tables.firstScenario.placeholdersValues.length.should.be.equal(1);
+		feature.tables.firstScenario.placeholdersValues[0].length.should.be.equal(2);
+		feature.tables.firstScenario.placeholdersValues[0][0].should.be.equal('homepage');
+		feature.tables.firstScenario.placeholdersValues[0][1].should.be.equal('click');
 	});
 
 });

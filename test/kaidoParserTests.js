@@ -10,6 +10,7 @@ function err(){ throw new Error(); }
 describe('kaidoParser tests', function() {
 
 	beforeEach(function(){
+		this.featureResolveTable = {"tables":{"firstScenario":{"placeholdersNames":["page","action"],"placeholdersValues":[["homepage","click"],["searchresult","mouseover"]]}},"scenarios":[{"camelName":"firstScenario","name":"first scenario","steps":[{"keyWord":"Given","step":"I visit [page]"},{"keyWord":"When","step":"I [action] something"},{"keyWord":"Then","step":"Something happens"}]}]};
     	kaidoParser = new kaidoParserClass();
   	});
 	
@@ -20,6 +21,11 @@ describe('kaidoParser tests', function() {
 		kaidoParser.parseFeatures.should.be.instanceOf(Function);
 		kaidoParser.parseFeature.should.be.instanceOf(Function);
 		kaidoParser.explodeIncludes.should.be.instanceOf(Function);
+		kaidoParser.resolveTables.should.be.instanceOf(Function);
+		kaidoParser.resolveTables.should.be.instanceOf(Function);
+		kaidoParser.resolveStep.should.be.instanceOf(Function);
+		kaidoParser.repeatSteps.should.be.instanceOf(Function);
+		kaidoParser.cloneObject.should.be.instanceOf(Function);
 		kaidoParser.start.should.be.instanceOf(Function);
 	});
 
@@ -93,4 +99,71 @@ describe('kaidoParser tests', function() {
 		}, err);
 	});
 
+	it('resolveStep', function() {
+		
+		var placeholdersNames = this.featureResolveTable.tables.firstScenario.placeholdersNames;
+		var placeholdersValues = this.featureResolveTable.tables.firstScenario.placeholdersValues[0];
+		var step1 = this.featureResolveTable.scenarios[0].steps[0];
+		var step2 = this.featureResolveTable.scenarios[0].steps[1];
+		var step3 = this.featureResolveTable.scenarios[0].steps[2];
+
+		//step1
+		kaidoParser.resolveStep(step1, placeholdersNames, placeholdersValues);
+		step1.step.should.be.equal('I visit homepage');
+
+		//step2
+		kaidoParser.resolveStep(step2, placeholdersNames, placeholdersValues);
+		step2.step.should.be.equal('I click something');
+
+		//step3
+		kaidoParser.resolveStep(step3, placeholdersNames, placeholdersValues);
+		step3.step.should.be.equal('Something happens');
+	});
+
+	it('repeatSteps', function() {
+		var feature = this.featureResolveTable;
+		var scenario = this.featureResolveTable.scenarios[0];
+		kaidoParser.repeatSteps({
+			scenario : {
+				scenario : scenario,
+				index : 0
+			},
+			placeholdersNames : [
+				'page',
+				'action'
+			],
+			placeholdersValues : [
+				'homepage',
+				'click'
+			],
+			feature : feature,
+			repeatedTime : 0
+		});
+		feature.scenarios.length.should.be.equal(1);
+		kaidoParser.repeatSteps({
+			scenario : {
+				scenario : scenario,
+				index : 0
+			},
+			placeholdersNames : [
+				'page',
+				'action'
+			],
+			placeholdersValues : [
+				'searchresult',
+				'mouseover'
+			],
+			feature : feature,
+			repeatedTime : 1
+		});
+		feature.scenarios.length.should.be.equal(2);
+	});
+
+	it('resolve tables', function() {
+		var feature = this.featureResolveTable;
+		var repeatStepsSpy = sinon.spy(kaidoParser, 'repeatSteps');
+		kaidoParser.resolveTables(feature);
+		feature.scenarios.length.should.be.equal(2);
+		repeatStepsSpy.calledTwice.should.be.true;
+	});
 });

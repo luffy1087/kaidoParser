@@ -119,11 +119,14 @@
 		var isTableDetected = !!this.executeRegExp(line, R_TABLE);
 		if (isTableDetected) {
 			var lastScenario = this.getLastScenario(feature);
-			if (!!lastScenario) {
-				lastScenario.table = {
-					placeholdersNames : [], //an array containing placeholdersName
-					placeholdersValues : [] //and array of arrayes containing the values corrisponding to the same placeholdersName values
-				}		
+			var camelName;
+			if (!!lastScenario && !feature.tables) {
+				camelName = lastScenario.camelName;
+				feature.tables = {};
+				feature.tables[camelName] = {
+					placeholdersNames : [],
+					placeholdersValues : []
+				}
 			}
 		}
 		return {
@@ -134,7 +137,8 @@
 
 	function detectPlaceholders(line, feature) {
 		var placeHolderInfo = this.executeRegExp(line, R_PLACEHOLDERS)
-		  , table = this.getLastScenario(feature).table
+		  , camelName = this.getLastScenario(feature).camelName
+		  , table = feature.tables[camelName]
 		  , isPlaceholderLine = !!placeHolderInfo && !!table;
 
 		if (!!placeHolderInfo && table) {
